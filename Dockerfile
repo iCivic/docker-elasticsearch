@@ -13,6 +13,12 @@ ENV ELASTICSEARCH_TARBALL https://artifacts.elastic.co/downloads/elasticsearch/e
 ENV ELASTICSEARCH_TARBALL_ASC https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-${ELASTICSEARCH_VERSION}.tar.gz.asc
 ENV ELASTICSEARCH_TARBALL_SHA1 66291d316aebf4203a02bc4dbf74360a467ec1a9
 
+RUN echo 'http://mirrors.ustc.edu.cn/alpine/v3.8/main' > /etc/apk/repositories \
+    && echo 'http://mirrors.ustc.edu.cn/alpine/v3.8/community' >>/etc/apk/repositories
+
+COPY ./elasticsearch.tar.gz.asc .
+COPY ./elasticsearch.tar.gz .
+
 # ensure elasticsearch user exists
 RUN set -ex \
     && addgroup -S elasticsearch \
@@ -26,9 +32,9 @@ RUN set -ex \
         gnupg \
         openssl \
         tar \
-    && wget -O elasticsearch.tar.gz "${ELASTICSEARCH_TARBALL}" \
-    && wget -O elasticsearch.tar.gz.asc "${ELASTICSEARCH_TARBALL_ASC}" \
-    && echo "${ELASTICSEARCH_TARBALL_SHA1}  elasticsearch.tar.gz" | sha1sum -c - \
+    # && wget -O elasticsearch.tar.gz "${ELASTICSEARCH_TARBALL}" \
+    # && wget -O elasticsearch.tar.gz.asc "${ELASTICSEARCH_TARBALL_ASC}" \
+    # && echo "${ELASTICSEARCH_TARBALL_SHA1}  elasticsearch.tar.gz" | sha1sum -c - \
     && export GNUPGHOME="$(mktemp -d)" \
     && gpg --keyserver pgp.mit.edu --recv-keys "${GPG_KEY}" \
     && gpg --batch --verify elasticsearch.tar.gz.asc elasticsearch.tar.gz \
